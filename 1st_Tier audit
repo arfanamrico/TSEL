@@ -1,0 +1,181 @@
+import win32com.client    
+import pandas as pd
+import os
+
+site = ['TNX128']
+
+pic_path = r"C:\Users\Lenovo\Documents\TSEL\Report\TNG876\1st_tier\TNX128"
+Excel = win32com.client.Dispatch("Excel.Application")
+wb = Excel.Workbooks.Open(r"C:\Users\Lenovo\Documents\TSEL\Report\TNG876\NGUL_Cluster_Optim_TNG876_L2300_U_SW_207-2.xlsx")
+###=======data GCELL=====================
+gcel = r"C:\Users\Lenovo\Documents\TSEL\data\4G Workspace Gcell Inner Outer 20250918\4G Gcell Inner Outer 20250918.csv"
+dfgcel = pd.read_csv(gcel)
+dfgcel = pd.DataFrame(dfgcel)
+dfgcl = dfgcel[(dfgcel['SITE_ID'].isin(site))&(dfgcel['FREQ_BAND']== 'L1800')&(dfgcel['Cell_ID'].isin([11,21,31]))].reset_index()
+siteid = dfgcl.loc[0,'SITE_ID']
+towertype = dfgcl.loc[0,'Site_Type']
+towerh1,towerh2,towerh3 = dfgcl.loc[0,'Height'],dfgcl.loc[1,'Height'],dfgcl.loc[2,'Height']
+longitude = dfgcl.loc[0,'LONG']
+latitude = dfgcl.loc[0,'LAT']
+
+anttype1,anttype2,anttype3 = dfgcl.loc[0,'Antenna_type'],dfgcl.loc[1,'Antenna_type'],dfgcl.loc[2,'Antenna_type']
+sector1,sector2,sector3 = dfgcl.loc[0,'Cell_Name'],dfgcl.loc[1,'Cell_Name'],dfgcl.loc[2,'Cell_Name']
+azimuth1pre, azimuth2pre, azimuth3pre = dfgcl.loc[0,'AZIMUTH'],dfgcl.loc[1,'AZIMUTH'],dfgcl.loc[2,'AZIMUTH']
+mdt1pre,mdt2pre,mdt3pre = dfgcl.loc[0,'MDT'],dfgcl.loc[1,'MDT'],dfgcl.loc[2,'MDT']
+pci1,pci2,pci3 = dfgcl.loc[0,'PCI'],dfgcl.loc[1,'PCI'],dfgcl.loc[2,'PCI']
+tac1,tac2,tac3 = dfgcl.loc[0,'TAC'],dfgcl.loc[1,'TAC'],dfgcl.loc[2,'TAC']
+enodbe1,enodbe2,enodbe3 = dfgcl.loc[0,'eNodeB_ID'],dfgcl.loc[1,'eNodeB_ID'],dfgcl.loc[2,'eNodeB_ID']
+cellid1,cellid2,cellid3 = dfgcl.loc[0,'Cell_ID'],dfgcl.loc[1,'Cell_ID'],dfgcl.loc[2,'Cell_ID']
+# azimuth1post, azimuth2post, azimuth3post = dfgcl.loc[0,'Azimuth post'],dfgcl.loc[1,'Azimuth post'],dfgcl.loc[2,'Azimuth post']
+# mdt1post,mdt2post,mdt3post = dfgcl.loc[0,'MDT post'],dfgcl.loc[1,'MDT post'],dfgcl.loc[2,'MDT post']
+##==================================
+sh_auditdata =wb.Worksheets("Audit-1st tier")
+ws =wb.Worksheets("Panoramic-1st tier")
+sh_dataaudit =wb.Worksheets("Ant Config-1st tier")
+sh_ant =wb.Worksheets("Antenna & RET-1st tier")
+
+#nama-nama foto
+panoramic = ["0.jpg","30.jpg","60.jpg","90.jpg","120.jpg","150.jpg","180.jpg","210.jpg","240.jpg","270.jpg","300.jpg","330.jpg"]
+sec1 = ["azz_com_1.jpg","azz_nocom_1.jpg","azz_comaf_1.jpg","azz_nocomaf_1.jpg","mt_1.jpg","mtaf_1.jpg"]
+sec2 = ["azz_com_2.jpg","azz_nocom_2.jpg","azz_comaf_2.jpg","azz_nocomaf_2.jpg","mt_2.jpg","mtaf_2.jpg"]
+sec3 = ["azz_com_3.jpg","azz_nocom_3.jpg","azz_comaf_3.jpg","azz_nocomaf_3.jpg","mt_3.jpg","mtaf_3.jpg"]
+auditdata = ["compas.jpg","antennaheight.jpg","tower.jpg","sitename.jpg"]
+dataaudit_1 = ["backview_1.jpg","sideview_1.jpg","bottomview_1.jpg","label_1.jpg","rru_1.jpg"]
+dataaudit_2 = ["backview_2.jpg","sideview_2.jpg","bottomview_2.jpg","label_2.jpg","rru_2.jpg"]
+dataaudit_3 = ["backview_3.jpg","sideview_3.jpg","bottomview_3.jpg","label_3.jpg","rru_3.jpg"]
+
+#mengisi data 1st tier
+# sh_ge.cells(7,2).value = pcrdate
+sh_auditdata.cells(8,2).value = siteid
+sh_auditdata.cells(9,2).value = towertype
+sh_auditdata.cells(10,3).value = f'{towerh1} M'
+sh_auditdata.cells(8,5).value = longitude
+sh_auditdata.cells(8,6).value = latitude
+#memasukkan gambar audit data #compas, antennaheight, tower photo, sitename
+try: sh_auditdata.Shapes.AddPicture(f'{pic_path}/site_audit/site/{auditdata[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_auditdata.Cells(1,1).Left, Top=sh_auditdata.Cells(21,1).Top, Width=311.04, Height=439.92)
+except: pass
+try: sh_auditdata.Shapes.AddPicture(f'{pic_path}/site_audit/site/{auditdata[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_auditdata.Cells(1,4).Left, Top=sh_auditdata.Cells(21,1).Top, Width=311.04, Height=439.92)
+except: pass
+try: sh_auditdata.Shapes.AddPicture(f'{pic_path}/site_audit/site/{auditdata[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_auditdata.Cells(1,1).Left, Top=sh_auditdata.Cells(53,1).Top, Width=311.04, Height=439.92)
+except: pass
+try: sh_auditdata.Shapes.AddPicture(f'{pic_path}/site_audit/site/{auditdata[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_auditdata.Cells(1,4).Left, Top=sh_auditdata.Cells(53,1).Top, Width=311.04, Height=439.92)
+except: pass
+
+#memasukkan gambar Panoramic
+#panoramic 0, 30, 60, 90
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[0]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,1).Left, Top=ws.Cells(10,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[1]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,6).Left, Top=ws.Cells(10,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[2]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,11).Left, Top=ws.Cells(10,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[3]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,16).Left, Top=ws.Cells(10,1).Top, Width=230.4, Height=151.2)
+except: pass
+#panoramic 120, 150, 180, 210
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[0]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,1).Left, Top=ws.Cells(22,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[1]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,6).Left, Top=ws.Cells(22,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[2]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,11).Left, Top=ws.Cells(22,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[3]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,16).Left, Top=ws.Cells(22,1).Top, Width=230.4, Height=151.2)
+except: pass
+#panoramic 240, 270, 300, 330
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[0]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,1).Left, Top=ws.Cells(34,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[1]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,6).Left, Top=ws.Cells(34,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[2]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,11).Left, Top=ws.Cells(34,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[3]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,16).Left, Top=ws.Cells(34,1).Top, Width=230.4, Height=151.2)
+except: pass
+
+#megisi data site 
+sh_dataaudit.cells(8,1).value,sh_dataaudit.cells(9,1).value,sh_dataaudit.cells(10,1).value = sector1, sector2, sector3
+sh_dataaudit.cells(8,5).value,sh_dataaudit.cells(9,5).value,sh_dataaudit.cells(10,5).value = anttype1, anttype2, anttype3
+sh_dataaudit.cells(8,8).value,sh_dataaudit.cells(9,8).value,sh_dataaudit.cells(10,8).value = f'{towerh1}M', f'{towerh2}M', f'{towerh3}M'
+sh_dataaudit.cells(8,9).value,sh_dataaudit.cells(9,9).value,sh_dataaudit.cells(10,9).value = azimuth1pre, azimuth2pre, azimuth3pre
+sh_dataaudit.cells(8,10).value,sh_dataaudit.cells(9,10).value,sh_dataaudit.cells(10,10).value = mdt1pre, mdt2pre, mdt3pre
+##======azimut compas=============
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(13,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(13,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(13,1).Top, Width=270, Height=136.8)
+except: pass
+##======azimuth no compas=========
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(23,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(23,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(23,1).Top, Width=270, Height=136.8)
+except: pass
+##======azimut compas after=============
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(33,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(33,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(33,1).Top, Width=270, Height=136.8)
+except: pass
+##======azimuth no compas after=========
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(43,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(43,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(43,1).Top, Width=270, Height=136.8)
+except: pass
+##======MDT=============
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(53,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(53,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(53,1).Top, Width=270, Height=136.8)
+except: pass
+##======MDT after=========
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(63,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(63,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(63,1).Top, Width=270, Height=136.8)
+except: pass
+
+##======back view=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(8,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(8,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(8,1).Top, Width=280.08, Height=126.72)
+except: pass
+##======side view=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(18,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(18,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(18,1).Top, Width=280.08, Height=126.72)
+except: pass
+##======bottom view=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(28,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(28,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(28,1).Top, Width=280.08, Height=126.72)
+except: pass
+##======Label Antenna=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(38,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(38,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(38,1).Top, Width=280.08, Height=126.72)
+except: pass
+##======RRU=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(48,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(48,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(48,1).Top, Width=280.08, Height=126.72)
+except: pass
+
+
+# namafile = f"QC_{df.loc[0,'DU ID']}.xlsx"
+# wb.SaveAs(Filename=f'{pic_path}/{namafile}')
+# wb.Close()
