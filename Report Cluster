@@ -1,0 +1,383 @@
+import win32com.client    
+import pandas as pd
+import os
+
+site = ['TNG876']
+
+pic_path = r"C:\Users\Lenovo\Documents\TSEL\Report\TNG876\capturan"
+Excel = win32com.client.Dispatch("Excel.Application")
+wb = Excel.Workbooks.Open(r"C:\Users\Lenovo\Documents\TSEL\thmp Report\NGUL_Cluster_Optim_[duid].xlsx")
+###=======data GCELL=====================
+gcel = r"C:\Users\Lenovo\Documents\TSEL\data\4G Workspace Gcell Inner Outer 20250918\4G Gcell Inner Outer 20250918.csv"
+dfgcel = pd.read_csv(gcel)
+dfgcel = pd.DataFrame(dfgcel)
+dfgcl = dfgcel[(dfgcel['SITE_ID'].isin(site))&(dfgcel['FREQ_BAND']== 'L2300')&(dfgcel['Cell_ID'].isin([14,24,34]))].reset_index()
+siteid = dfgcl.loc[0,'SITE_ID']
+enodbename = dfgcl.loc[0,'LTE_NE_Name']
+towertype = dfgcl.loc[0,'Site_Type']
+towerh1,towerh2,towerh3 = dfgcl.loc[0,'Height'],dfgcl.loc[1,'Height'],dfgcl.loc[2,'Height']
+longitude = dfgcl.loc[0,'LONG']
+latitude = dfgcl.loc[0,'LAT']
+
+anttype1,anttype2,anttype3 = dfgcl.loc[0,'Antenna_type'],dfgcl.loc[1,'Antenna_type'],dfgcl.loc[2,'Antenna_type']
+sector1,sector2,sector3 = dfgcl.loc[0,'Cell_Name'],dfgcl.loc[1,'Cell_Name'],dfgcl.loc[2,'Cell_Name']
+azimuth1pre, azimuth2pre, azimuth3pre = dfgcl.loc[0,'AZIMUTH'],dfgcl.loc[1,'AZIMUTH'],dfgcl.loc[2,'AZIMUTH']
+mdt1pre,mdt2pre,mdt3pre = dfgcl.loc[0,'MDT'],dfgcl.loc[1,'MDT'],dfgcl.loc[2,'MDT']
+pci1,pci2,pci3 = dfgcl.loc[0,'PCI'],dfgcl.loc[1,'PCI'],dfgcl.loc[2,'PCI']
+tac1,tac2,tac3 = dfgcl.loc[0,'TAC'],dfgcl.loc[1,'TAC'],dfgcl.loc[2,'TAC']
+enodbe1,enodbe2,enodbe3 = dfgcl.loc[0,'eNodeB_ID'],dfgcl.loc[1,'eNodeB_ID'],dfgcl.loc[2,'eNodeB_ID']
+cellid1,cellid2,cellid3 = dfgcl.loc[0,'Cell_ID'],dfgcl.loc[1,'Cell_ID'],dfgcl.loc[2,'Cell_ID']
+# azimuth1post, azimuth2post, azimuth3post = dfgcl.loc[0,'Azimuth post'],dfgcl.loc[1,'Azimuth post'],dfgcl.loc[2,'Azimuth post']
+# mdt1post,mdt2post,mdt3post = dfgcl.loc[0,'MDT post'],dfgcl.loc[1,'MDT post'],dfgcl.loc[2,'MDT post']
+##==================================
+
+#penamaan sheet
+sh_cover =wb.Worksheets("Cover Manual (Naura Pass) (2)")
+sh_ge =wb.Worksheets("Map & LST LOCATION")
+sh_auditdata =wb.Worksheets("Audit_Main Site")
+ws =wb.Worksheets("Panoramic_Main Site")
+sh_dataaudit =wb.Worksheets("Ant Config_Main Site")
+sh_ant =wb.Worksheets("Ant&RET_Main Site")
+sh_fung =wb.Worksheets("Functionality Test")
+sh_speedtest =wb.Worksheets("SPEEDTEST-PING-USSD")
+sh_csfb =wb.Worksheets("CSFB & VOLTE")
+sh_sms =wb.Worksheets("SMS")
+# sh_mov =wb.Worksheets("Moving")
+sh_ho =wb.Worksheets("HO")
+sh_pci =wb.Worksheets("SSV-PCI")
+sh_rsrp =wb.Worksheets("SSV-RSRP")
+sh_sinr =wb.Worksheets("SSV-SINR")
+sh_thplo =wb.Worksheets("SSV_DLULThp LOCK")
+sh_thpulo =wb.Worksheets("SSV_DLULThp UNLOCK")
+sh_spider =wb.Worksheets("SSV_SPIDERGRAPH-EARFCN-HO")
+sh_rssi =wb.Worksheets("SSO_RSRP-SINR")
+
+#nama-nama foto
+panoramic = ["0.jpg","30.jpg","60.jpg","90.jpg","120.jpg","150.jpg","180.jpg","210.jpg","240.jpg","270.jpg","300.jpg","330.jpg"]
+sec1 = ["azz_com_1.jpg","azz_nocom_1.jpg","azz_comaf_1.jpg","azz_nocomaf_1.jpg","mt_1.jpg","mtaf_1.jpg"]
+sec2 = ["azz_com_2.jpg","azz_nocom_2.jpg","azz_comaf_2.jpg","azz_nocomaf_2.jpg","mt_2.jpg","mtaf_2.jpg"]
+sec3 = ["azz_com_3.jpg","azz_nocom_3.jpg","azz_comaf_3.jpg","azz_nocomaf_3.jpg","mt_3.jpg","mtaf_3.jpg"]
+auditdata = ["compas.jpg","antennaheight.jpg","tower.jpg","sitename.jpg"]
+dataaudit_1 = ["backview_1.jpg","sideview_1.jpg","bottomview_1.jpg","label_1.jpg","rru_1.jpg"]
+dataaudit_2 = ["backview_2.jpg","sideview_2.jpg","bottomview_2.jpg","label_2.jpg","rru_2.jpg"]
+dataaudit_3 = ["backview_3.jpg","sideview_3.jpg","bottomview_3.jpg","label_3.jpg","rru_3.jpg"]
+speed = ["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg"]
+csfb = ["1.jpg","2.jpg"]
+sms = ["1.jpg","2.jpg","3.jpg"]
+ho = ["1.jpg"]
+
+plotlo = ["rsrplo.jpg","sinrlo.jpg","dllo.jpg","ullo.jpg","pcilo.jpg","ho.jpg","hoan.jpg","spider.jpg","earfcn.jpg"]
+plotunlo = ["rsrpunlo.jpg","sinrunlo.jpg","dlunlo.jpg","ulunlo.jpg","pciunlo.jpg"]
+#mengisi data sheet Cover
+sh_cover.cells(7,4).value = siteid
+sh_cover.cells(8,15).value = enodbename
+sh_cover.cells(9,15).value = enodbe1
+#memasukkan gambar GE
+try:
+    gename = 'ge.jpg'
+    sh_ge.Shapes.AddPicture(f'{pic_path}/dt_plot/{gename}',LinkToFile=False, SaveWithDocument=True, Left=sh_ge.Cells(1,1).Left, Top=sh_ge.Cells(11,1).Top, Width=678.24, Height=453.6)
+except:
+    pass
+
+#mengisi data sheet GE
+# sh_ge.cells(7,2).value = pcrdate
+sh_auditdata.cells(8,2).value = siteid
+sh_auditdata.cells(9,2).value = towertype
+sh_auditdata.cells(10,3).value = f'{towerh1} M'
+sh_auditdata.cells(8,5).value = longitude
+sh_auditdata.cells(8,6).value = latitude
+#memasukkan gambar audit data #compas, antennaheight, tower photo, sitename
+try: sh_auditdata.Shapes.AddPicture(f'{pic_path}/site_audit/site/{auditdata[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_auditdata.Cells(1,1).Left, Top=sh_auditdata.Cells(21,1).Top, Width=311.04, Height=439.92)
+except: pass
+try: sh_auditdata.Shapes.AddPicture(f'{pic_path}/site_audit/site/{auditdata[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_auditdata.Cells(1,4).Left, Top=sh_auditdata.Cells(21,1).Top, Width=311.04, Height=439.92)
+except: pass
+try: sh_auditdata.Shapes.AddPicture(f'{pic_path}/site_audit/site/{auditdata[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_auditdata.Cells(1,1).Left, Top=sh_auditdata.Cells(53,1).Top, Width=311.04, Height=439.92)
+except: pass
+try: sh_auditdata.Shapes.AddPicture(f'{pic_path}/site_audit/site/{auditdata[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_auditdata.Cells(1,4).Left, Top=sh_auditdata.Cells(53,1).Top, Width=311.04, Height=439.92)
+except: pass
+
+#memasukkan gambar Panoramic
+#panoramic 0, 30, 60, 90
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[0]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,1).Left, Top=ws.Cells(10,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[1]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,6).Left, Top=ws.Cells(10,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[2]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,11).Left, Top=ws.Cells(10,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[3]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,16).Left, Top=ws.Cells(10,1).Top, Width=230.4, Height=151.2)
+except: pass
+#panoramic 120, 150, 180, 210
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[0]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,1).Left, Top=ws.Cells(22,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[1]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,6).Left, Top=ws.Cells(22,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[2]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,11).Left, Top=ws.Cells(22,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[3]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,16).Left, Top=ws.Cells(22,1).Top, Width=230.4, Height=151.2)
+except: pass
+#panoramic 240, 270, 300, 330
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[0]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,1).Left, Top=ws.Cells(34,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[1]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,6).Left, Top=ws.Cells(34,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[2]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,11).Left, Top=ws.Cells(34,1).Top, Width=230.4, Height=151.2)
+except: pass
+try: ws.Shapes.AddPicture(f'{pic_path}/site_audit/panoramik/{panoramic[3]}',LinkToFile=False, SaveWithDocument=True, Left=ws.Cells(1,16).Left, Top=ws.Cells(34,1).Top, Width=230.4, Height=151.2)
+except: pass
+
+#megisi data site 
+sh_dataaudit.cells(8,1).value,sh_dataaudit.cells(9,1).value,sh_dataaudit.cells(10,1).value = sector1, sector2, sector3
+sh_dataaudit.cells(8,5).value,sh_dataaudit.cells(9,5).value,sh_dataaudit.cells(10,5).value = anttype1, anttype2, anttype3
+sh_dataaudit.cells(8,8).value,sh_dataaudit.cells(9,8).value,sh_dataaudit.cells(10,8).value = f'{towerh1}M', f'{towerh2}M', f'{towerh3}M'
+sh_dataaudit.cells(8,9).value,sh_dataaudit.cells(9,9).value,sh_dataaudit.cells(10,9).value = azimuth1pre, azimuth2pre, azimuth3pre
+sh_dataaudit.cells(8,10).value,sh_dataaudit.cells(9,10).value,sh_dataaudit.cells(10,10).value = mdt1pre, mdt2pre, mdt3pre
+##======azimut compas=============
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(13,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(13,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(13,1).Top, Width=270, Height=136.8)
+except: pass
+##======azimuth no compas=========
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(23,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(23,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(23,1).Top, Width=270, Height=136.8)
+except: pass
+##======azimut compas after=============
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(33,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(33,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(33,1).Top, Width=270, Height=136.8)
+except: pass
+##======azimuth no compas after=========
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(43,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(43,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(43,1).Top, Width=270, Height=136.8)
+except: pass
+##======MDT=============
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(53,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(53,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(53,1).Top, Width=270, Height=136.8)
+except: pass
+##======MDT after=========
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{sec1[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,3).Left, Top=sh_dataaudit.Cells(63,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{sec2[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,9).Left, Top=sh_dataaudit.Cells(63,1).Top, Width=270, Height=136.8)
+except: pass
+try: sh_dataaudit.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{sec3[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_dataaudit.Cells(1,15).Left, Top=sh_dataaudit.Cells(63,1).Top, Width=270, Height=136.8)
+except: pass
+
+##======back view=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(8,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(8,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(8,1).Top, Width=280.08, Height=126.72)
+except: pass
+##======side view=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(18,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(18,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(18,1).Top, Width=280.08, Height=126.72)
+except: pass
+##======bottom view=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(28,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(28,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(28,1).Top, Width=280.08, Height=126.72)
+except: pass
+##======Label Antenna=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(38,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(38,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(38,1).Top, Width=280.08, Height=126.72)
+except: pass
+##======RRU=========
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector1/{dataaudit_1[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,2).Left, Top=sh_ant.Cells(48,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector2/{dataaudit_2[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,8).Left, Top=sh_ant.Cells(48,1).Top, Width=280.08, Height=126.72)
+except: pass
+try: sh_ant.Shapes.AddPicture(f'{pic_path}/site_audit/sector3/{dataaudit_3[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ant.Cells(1,14).Left, Top=sh_ant.Cells(48,1).Top, Width=280.08, Height=126.72)
+except: pass
+
+#mengisi data sheet Functionality Test
+sh_fung.cells(17,4).value, sh_fung.cells(17,8).value, sh_fung.cells(17,12).value = siteid, siteid, siteid
+sh_fung.cells(19,4).value, sh_fung.cells(19,8).value, sh_fung.cells(19,12).value = cellid1, cellid2, cellid3
+sh_fung.cells(21,4).value, sh_fung.cells(21,8).value, sh_fung.cells(21,12).value = enodbe1, enodbe2, enodbe3
+sh_fung.cells(23,4).value, sh_fung.cells(23,8).value, sh_fung.cells(23,12).value = tac1, tac2, tac3
+sh_fung.cells(25,4).value, sh_fung.cells(25,8).value, sh_fung.cells(25,12).value = pci1, pci2, pci3
+
+#memasukkan gambar speedtest sec 1
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC1/speedtest/{speed[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,1).Left, Top=sh_speedtest.Cells(9,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC1/speedtest/{speed[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,5).Left, Top=sh_speedtest.Cells(9,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC1/speedtest/{speed[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,8).Left, Top=sh_speedtest.Cells(9,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC1/speedtest/{speed[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,11).Left, Top=sh_speedtest.Cells(9,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC1/speedtest/{speed[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,14).Left, Top=sh_speedtest.Cells(9,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC1/speedtest/{speed[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,17).Left, Top=sh_speedtest.Cells(9,1).Top, Width=187.2, Height=289.44)
+except: pass
+#memasukkan gambar speedtest sec 2
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC2/speedtest/{speed[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,1).Left, Top=sh_speedtest.Cells(38,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC2/speedtest/{speed[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,5).Left, Top=sh_speedtest.Cells(38,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC2/speedtest/{speed[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,8).Left, Top=sh_speedtest.Cells(38,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC2/speedtest/{speed[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,11).Left, Top=sh_speedtest.Cells(38,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC2/speedtest/{speed[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,14).Left, Top=sh_speedtest.Cells(38,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC2/speedtest/{speed[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,17).Left, Top=sh_speedtest.Cells(38,1).Top, Width=187.2, Height=289.44)
+except: pass
+#memasukkan gambar speedtest sec 3
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC3/speedtest/{speed[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,1).Left, Top=sh_speedtest.Cells(67,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC3/speedtest/{speed[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,5).Left, Top=sh_speedtest.Cells(67,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC3/speedtest/{speed[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,8).Left, Top=sh_speedtest.Cells(67,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC3/speedtest/{speed[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,11).Left, Top=sh_speedtest.Cells(67,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC3/speedtest/{speed[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,14).Left, Top=sh_speedtest.Cells(67,1).Top, Width=187.2, Height=289.44)
+except: pass
+try: sh_speedtest.Shapes.AddPicture(f'{pic_path}/CET/SEC3/speedtest/{speed[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_speedtest.Cells(1,17).Left, Top=sh_speedtest.Cells(67,1).Top, Width=187.2, Height=289.44)
+except: pass
+#memasukkan gambar CSFB & VOLTE
+##====Volte 1=======
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC1/voltemoc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,1).Left, Top=sh_csfb.Cells(10,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC1/voltemoc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,4).Left, Top=sh_csfb.Cells(10,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC1/voltemtc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,8).Left, Top=sh_csfb.Cells(10,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC1/voltemtc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,11).Left, Top=sh_csfb.Cells(10,1).Top, Width=160.56, Height=339.84)
+except: pass
+##====CSFB 1=======
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC1/csfbmoc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,15).Left, Top=sh_csfb.Cells(10,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC1/csfbmoc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,18).Left, Top=sh_csfb.Cells(10,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC1/csfbmtc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,22).Left, Top=sh_csfb.Cells(10,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC1/csfbmtc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,25).Left, Top=sh_csfb.Cells(10,1).Top, Width=160.56, Height=339.84)
+except: pass
+##====Volte 2=======
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC2/voltemoc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,1).Left, Top=sh_csfb.Cells(48,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC2/voltemoc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,4).Left, Top=sh_csfb.Cells(48,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC2/voltemtc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,8).Left, Top=sh_csfb.Cells(48,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC2/voltemtc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,11).Left, Top=sh_csfb.Cells(48,1).Top, Width=160.56, Height=339.84)
+except: pass
+##====CSFB 2=======
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC2/csfbmoc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,15).Left, Top=sh_csfb.Cells(48,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC2/csfbmoc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,18).Left, Top=sh_csfb.Cells(48,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC2/csfbmtc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,22).Left, Top=sh_csfb.Cells(48,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC2/csfbmtc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,25).Left, Top=sh_csfb.Cells(48,1).Top, Width=160.56, Height=339.84)
+except: pass
+##====Volte 3=======
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC3/voltemoc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,1).Left, Top=sh_csfb.Cells(84,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC3/voltemoc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,4).Left, Top=sh_csfb.Cells(84,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC3/voltemtc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,8).Left, Top=sh_csfb.Cells(84,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC3/voltemtc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,11).Left, Top=sh_csfb.Cells(84,1).Top, Width=160.56, Height=339.84)
+except: pass
+##====CSFB 3=======
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC3/csfbmoc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,15).Left, Top=sh_csfb.Cells(84,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC3/csfbmoc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,18).Left, Top=sh_csfb.Cells(84,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC3/csfbmtc/{csfb[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,22).Left, Top=sh_csfb.Cells(84,1).Top, Width=160.56, Height=339.84)
+except: pass
+try: sh_csfb.Shapes.AddPicture(f'{pic_path}/CET/SEC3/csfbmtc/{csfb[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,25).Left, Top=sh_csfb.Cells(84,1).Top, Width=160.56, Height=339.84)
+except: pass
+##====SMS 1=======
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC1/sms/{sms[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_sms.Cells(1,1).Left, Top=sh_sms.Cells(8,1).Top, Width=166.32, Height=337.68)
+except: pass
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC1/sms/{sms[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,5).Left, Top=sh_csfb.Cells(8,1).Top, Width=166.32, Height=337.68)
+except: pass
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC1/sms/{sms[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,9).Left, Top=sh_csfb.Cells(8,1).Top, Width=166.32, Height=337.68)
+except: pass
+##====SMS 2=======
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC2/sms/{sms[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_sms.Cells(1,1).Left, Top=sh_sms.Cells(39,1).Top, Width=166.32, Height=337.68)
+except: pass
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC2/sms/{sms[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,5).Left, Top=sh_csfb.Cells(39,1).Top, Width=166.32, Height=337.68)
+except: pass
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC2/sms/{sms[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,9).Left, Top=sh_csfb.Cells(39,1).Top, Width=166.32, Height=337.68)
+except: pass
+##====SMS 3=======
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC3/sms/{sms[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_sms.Cells(1,1).Left, Top=sh_sms.Cells(69,1).Top, Width=166.32, Height=337.68)
+except: pass
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC3/sms/{sms[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,5).Left, Top=sh_csfb.Cells(69,1).Top, Width=166.32, Height=337.68)
+except: pass
+try: sh_sms.Shapes.AddPicture(f'{pic_path}/CET/SEC3/sms/{sms[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_csfb.Cells(1,9).Left, Top=sh_csfb.Cells(69,1).Top, Width=166.32, Height=337.68)
+except: pass
+##====HO=======
+try: sh_ho.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[6]}',LinkToFile=False, SaveWithDocument=True, Left=sh_ho.Cells(1,1).Left, Top=sh_ho.Cells(5,1).Top, Width=665.28, Height=360.72)
+except: pass
+##====PCI=======
+sh_pci.cells(8,6).value, sh_pci.cells(8,8).value, sh_pci.cells(8,10).value = pci1, pci2, pci3
+try: sh_pci.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_pci.Cells(1,2).Left, Top=sh_pci.Cells(12,1).Top, Width=702.72, Height=327.6)
+except: pass
+try: sh_pci.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotunlo[4]}',LinkToFile=False, SaveWithDocument=True, Left=sh_pci.Cells(1,2).Left, Top=sh_pci.Cells(27,1).Top, Width=702.72, Height=327.6)
+except: pass
+##====RSRP=======
+try: sh_rsrp.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_rsrp.Cells(1,2).Left, Top=sh_rsrp.Cells(8,1).Top, Width=654.48, Height=332.64)
+except: pass
+try: sh_rsrp.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotunlo[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_rsrp.Cells(1,2).Left, Top=sh_rsrp.Cells(23,1).Top, Width=654.48, Height=332.64)
+except: pass
+##====SINR=======
+try: sh_sinr.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_sinr.Cells(1,2).Left, Top=sh_sinr.Cells(8,1).Top, Width=654.48, Height=332.64)
+except: pass
+try: sh_sinr.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotunlo[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_sinr.Cells(1,2).Left, Top=sh_sinr.Cells(23,1).Top, Width=654.48, Height=332.64)
+except: pass
+##====THP LOCK=======
+try: sh_thplo.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_thplo.Cells(1,2).Left, Top=sh_thplo.Cells(8,1).Top, Width=654.48, Height=332.64)
+except: pass
+try: sh_thplo.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_thplo.Cells(1,2).Left, Top=sh_thplo.Cells(23,1).Top, Width=654.48, Height=332.64)
+except: pass
+##====THP UNLOCK=======
+try: sh_thpulo.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotunlo[2]}',LinkToFile=False, SaveWithDocument=True, Left=sh_thpulo.Cells(1,2).Left, Top=sh_thpulo.Cells(8,1).Top, Width=654.48, Height=332.64)
+except: pass
+try: sh_thpulo.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotunlo[3]}',LinkToFile=False, SaveWithDocument=True, Left=sh_thpulo.Cells(1,2).Left, Top=sh_thpulo.Cells(23,1).Top, Width=654.48, Height=332.64)
+except: pass
+##====SPIDER=======
+try: sh_spider.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[7]}',LinkToFile=False, SaveWithDocument=True, Left=sh_spider.Cells(1,2).Left, Top=sh_spider.Cells(8,1).Top, Width=654.48, Height=332.64)
+except: pass
+try: sh_spider.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[8]}',LinkToFile=False, SaveWithDocument=True, Left=sh_spider.Cells(1,2).Left, Top=sh_spider.Cells(23,1).Top, Width=654.48, Height=332.64)
+except: pass
+try: sh_spider.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[5]}',LinkToFile=False, SaveWithDocument=True, Left=sh_spider.Cells(1,2).Left, Top=sh_spider.Cells(47,1).Top, Width=654.48, Height=332.64)
+except: pass
+##====SSO RSRP SINR=======
+try: sh_rssi.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_rssi.Cells(1,2).Left, Top=sh_rssi.Cells(13,1).Top, Width=378.72, Height=208.08)
+except: pass
+try: sh_rssi.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotunlo[0]}',LinkToFile=False, SaveWithDocument=True, Left=sh_rssi.Cells(1,11).Left, Top=sh_rssi.Cells(13,1).Top, Width=378.72, Height=208.08)
+except: pass
+try: sh_rssi.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotlo[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_rssi.Cells(1,2).Left, Top=sh_rssi.Cells(40,1).Top, Width=378.72, Height=208.08)
+except: pass
+try: sh_rssi.Shapes.AddPicture(f'{pic_path}/dt_plot/{plotunlo[1]}',LinkToFile=False, SaveWithDocument=True, Left=sh_rssi.Cells(1,11).Left, Top=sh_rssi.Cells(40,1).Top, Width=378.72, Height=208.08)
+except: pass
+# namafile = f"QC_{df.loc[0,'DU ID']}.xlsx"
+# wb.SaveAs(Filename=f'{pic_path}/{namafile}')
+# wb.Close()
+print('done by Arfan Amrico (08999505000)')
